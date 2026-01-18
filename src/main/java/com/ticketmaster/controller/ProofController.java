@@ -80,4 +80,31 @@ public class ProofController {
     public List<ProofOfPayment> getAllProofs() {
         return service.getAllProofs();
     }
+
+
+    @DeleteMapping("/proofs/{id}")
+    public ResponseEntity<?> deleteProof(@PathVariable Long id) {
+        ProofOfPayment proof = service.getProofById(id);
+
+        if (proof == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Proof not found");
+        }
+
+        // Delete file from disk
+        File file = new File(uploadDir, proof.getFileName());
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            if (!deleted) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to delete file");
+            }
+        }
+
+        // Delete DB record
+        service.deleteProof(id);
+
+        return ResponseEntity.ok("Proof deleted successfully");
+    }
+
 }

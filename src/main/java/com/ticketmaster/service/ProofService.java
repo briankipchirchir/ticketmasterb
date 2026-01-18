@@ -21,4 +21,13 @@ public class ProofService {
     public List<ProofOfPayment> getAllProofs() {
         return repository.findAll();
     }
+
+    public ProofOfPayment getProofById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    public void deleteProof(Long id) {
+        repository.deleteById(id);
+    }
+
 }
