@@ -28,8 +28,6 @@ public class ProofController {
     public ProofController(ProofService service) {
         this.service = service;
     }
-
-    // POST /api/proof
     @PostMapping("/proof")
     public ResponseEntity<?> uploadProof(
             @RequestParam("name") String name,
@@ -39,22 +37,33 @@ public class ProofController {
             @RequestParam("file") MultipartFile file
     ) {
         try {
-            // Ensure upload folder exists
             File dir = new File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
+            if (!dir.exists()) {
+                boolean created = dir.mkdirs();
+                if (!created) {
+                    throw new IOException("Could not create upload directory: " + uploadDir);
+                }
+            }
 
-            // Save file
-            String filePath = "uploads/" + file.getOriginalFilename();
 
-            File dest = new File(uploadDir, Objects.requireNonNull(file.getOriginalFilename()));
+            String originalName = Objects.requireNonNull(file.getOriginalFilename());
+            String uniqueName = System.currentTimeMillis() + "_" + originalName;
+
+            File dest = new File(dir, uniqueName);
             file.transferTo(dest);
 
+            String filePath = "uploads/" + uniqueName;
 
-            // Save to DB
-            ProofOfPayment proof = new ProofOfPayment(name, email,tickets,amount, file.getOriginalFilename(), filePath);
-            ProofOfPayment saved = service.saveProof(proof);
+            ProofOfPayment proof = new ProofOfPayment(
+                    name,
+                    email,
+                    tickets,
+                    amount,
+                    uniqueName,
+                    filePath
+            );
 
-            return ResponseEntity.ok(saved);
+            return ResponseEntity.ok(service.saveProof(proof));
 
         } catch (MaxUploadSizeExceededException e) {
             return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
@@ -64,6 +73,7 @@ public class ProofController {
                     .body("Failed to save file: " + e.getMessage());
         }
     }
+
 
     // GET /api/proofs
     @GetMapping("/proofs")
