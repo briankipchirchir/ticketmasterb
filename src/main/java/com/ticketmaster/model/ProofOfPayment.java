@@ -17,17 +17,20 @@ public class ProofOfPayment {
     private String fileName; // Stores the uploaded file name
     private String filePath; // Stores the local path where file is saved
 
+    private String paymentMethod;
+
     // Constructors
     public ProofOfPayment() {}
 
     // Full constructor including tickets and amount
-    public ProofOfPayment(String userName, String userEmail, String tickets, Double amount, String fileName, String filePath) {
+    public ProofOfPayment(String userName, String userEmail, String tickets, Double amount, String fileName, String filePath, String paymentMethod) {
         this.userName = userName;
         this.userEmail = userEmail;
         this.tickets = tickets;
         this.amount = amount;
         this.fileName = fileName;
         this.filePath = filePath;
+        this.paymentMethod = paymentMethod;
     }
 
     // Getters & Setters
@@ -50,4 +53,7 @@ public class ProofOfPayment {
 
     public String getFilePath() { return filePath; }
     public void setFilePath(String filePath) { this.filePath = filePath; }
+
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 }

@@ -34,7 +34,9 @@ public class ProofController {
             @RequestParam("email") String email,
             @RequestParam("tickets") String tickets,
             @RequestParam("amount") Double amount,
+            @RequestParam("paymentMethod") String paymentMethod,
             @RequestParam("file") MultipartFile file
+
     ) {
         try {
             File dir = new File(uploadDir);
@@ -60,7 +62,8 @@ public class ProofController {
                     tickets,
                     amount,
                     uniqueName,
-                    filePath
+                    filePath,
+                    paymentMethod
             );
 
             return ResponseEntity.ok(service.saveProof(proof));
