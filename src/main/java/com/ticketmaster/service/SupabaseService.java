@@ -7,6 +7,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;  // <-- Use this for Spring Boot 3.x
 import java.io.IOException;
 
 @Service
@@ -23,17 +24,26 @@ public class SupabaseService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @PostConstruct
+    public void init() {
+        System.out.println("========================================");
+        System.out.println("SUPABASE SERVICE INITIALIZED");
+        System.out.println("URL: " + supabaseUrl);
+        System.out.println("Bucket: " + bucketName);
+        System.out.println("Key loaded: " + (supabaseKey != null && !supabaseKey.isEmpty() ? "YES" : "NO"));
+        if (supabaseKey != null && supabaseKey.length() > 10) {
+            System.out.println("Key preview: " + supabaseKey.substring(0, 15) + "...");
+        }
+        System.out.println("========================================");
+    }
+
     public String uploadFile(MultipartFile file) throws IOException {
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         String uploadUrl = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fileName;
 
-        System.out.println("=== SUPABASE UPLOAD DEBUG ===");
+        System.out.println("=== SUPABASE UPLOAD ATTEMPT ===");
         System.out.println("Upload URL: " + uploadUrl);
-        System.out.println("Bucket: " + bucketName);
-        System.out.println("File name: " + fileName);
-        System.out.println("File size: " + file.getSize() + " bytes");
-        System.out.println("Content type: " + file.getContentType());
-        System.out.println("API Key (first 10 chars): " + supabaseKey.substring(0, Math.min(10, supabaseKey.length())) + "...");
+        System.out.println("File: " + fileName + " (" + file.getSize() + " bytes)");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(file.getContentType()));
@@ -50,32 +60,26 @@ public class SupabaseService {
                     String.class
             );
 
-            System.out.println("Upload SUCCESS!");
-            System.out.println("Status: " + response.getStatusCode());
-            System.out.println("Response body: " + response.getBody());
+            System.out.println("✓ Upload SUCCESS - Status: " + response.getStatusCode());
 
-            // Return public URL
             String publicUrl = supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + fileName;
-            System.out.println("Public URL: " + publicUrl);
+            System.out.println("✓ Public URL: " + publicUrl);
             return publicUrl;
 
         } catch (HttpClientErrorException e) {
-            System.err.println("Upload FAILED!");
-            System.err.println("Status: " + e.getStatusCode());
-            System.err.println("Response body: " + e.getResponseBodyAsString());
-            throw new IOException("Failed to upload to Supabase: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            System.err.println("✗ Upload FAILED - Status: " + e.getStatusCode());
+            System.err.println("✗ Error: " + e.getResponseBodyAsString());
+            throw new IOException("Supabase upload failed: " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            System.err.println("Upload FAILED with exception!");
+            System.err.println("✗ Upload EXCEPTION: " + e.getMessage());
             e.printStackTrace();
-            throw new IOException("Failed to upload to Supabase: " + e.getMessage());
+            throw new IOException("Supabase upload failed: " + e.getMessage());
         }
     }
 
     public void deleteFile(String fileUrl) {
         String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         String deleteUrl = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fileName;
-
-        System.out.println("Deleting file: " + deleteUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + supabaseKey);
@@ -85,10 +89,9 @@ public class SupabaseService {
 
         try {
             restTemplate.exchange(deleteUrl, HttpMethod.DELETE, requestEntity, String.class);
-            System.out.println("Delete SUCCESS");
+            System.out.println("✓ File deleted: " + fileName);
         } catch (Exception e) {
-            System.err.println("Failed to delete from Supabase: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("✗ Delete failed: " + e.getMessage());
         }
     }
 }
