@@ -1,11 +1,8 @@
 package com.ticketmaster.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,19 +27,12 @@ public class SupabaseService {
         String uploadUrl = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fileName;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setContentType(MediaType.parseMediaType(file.getContentType())); // Use actual file content type
         headers.set("Authorization", "Bearer " + supabaseKey);
         headers.set("apikey", supabaseKey);
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new ByteArrayResource(file.getBytes()) {
-            @Override
-            public String getFilename() {
-                return file.getOriginalFilename();
-            }
-        });
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        // Send raw bytes directly, not as multipart
+        HttpEntity<byte[]> requestEntity = new HttpEntity<>(file.getBytes(), headers);
 
         try {
             restTemplate.exchange(uploadUrl, HttpMethod.POST, requestEntity, String.class);
