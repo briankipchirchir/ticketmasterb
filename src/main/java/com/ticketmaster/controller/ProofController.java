@@ -45,10 +45,10 @@ public class ProofController {
         System.out.println("Amount: " + amount);
         System.out.println("Payment Method: " + paymentMethod);
         System.out.println("File: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
+        System.out.println("SupabaseService is null? " + (supabaseService == null));
         System.out.println("========================================");
 
         try {
-            // Upload to Supabase
             System.out.println("Calling supabaseService.uploadFile()...");
             String fileUrl = supabaseService.uploadFile(file);
             System.out.println("Upload completed. File URL: " + fileUrl);
@@ -66,13 +66,24 @@ public class ProofController {
             return ResponseEntity.ok(saved);
 
         } catch (IOException e) {
-            System.err.println("ERROR: Failed to upload file");
+            System.err.println("========================================");
+            System.err.println("ERROR: IOException caught");
+            System.err.println("Message: " + e.getMessage());
+            System.err.println("========================================");
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to upload file: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("========================================");
+            System.err.println("ERROR: Unexpected exception");
+            System.err.println("Type: " + e.getClass().getName());
+            System.err.println("Message: " + e.getMessage());
+            System.err.println("========================================");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
         }
     }
-
     @GetMapping("/proofs")
     public List<ProofOfPayment> getAllProofs() {
         return service.getAllProofs();
