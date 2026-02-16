@@ -1,9 +1,12 @@
 com/ticketmaster/model/ProofOfPayment.class
-com/ticketmaster/service/ProofService.class
-WebConfig.class
+com/ticketmaster/service/SupabaseService.class
+Cors/GlobalCorsConfig$1.class
 com/ticketmaster/controller/ProofController.class
 com/ticketmaster/TicketBackendApplication.class
-Cors/Config.class
 com/ticketmaster/App.class
+com/ticketmaster/service/ProofService.class
+WebConfig.class
+Cors/Config.class
+Cors/GlobalCorsConfig.class
 com/ticketmaster/repository/ProofRepository.class
 Cors/Config$1.class

@@ -1,5 +1,7 @@
 /home/kipchirchir/ticket-backend/ticket-backend/src/main/java/com/ticketmaster/repository/ProofRepository.java
 /home/kipchirchir/ticket-backend/ticket-backend/src/main/java/com/ticketmaster/model/ProofOfPayment.java
+/home/kipchirchir/ticket-backend/ticket-backend/src/main/java/com/ticketmaster/service/SupabaseService.java
+/home/kipchirchir/ticket-backend/ticket-backend/src/main/java/Cors/GlobalCorsConfig.java
 /home/kipchirchir/ticket-backend/ticket-backend/src/main/java/WebConfig.java
 /home/kipchirchir/ticket-backend/ticket-backend/src/main/java/com/ticketmaster/service/ProofService.java
 /home/kipchirchir/ticket-backend/ticket-backend/src/main/java/com/ticketmaster/App.java
