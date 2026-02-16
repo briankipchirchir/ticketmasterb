@@ -22,6 +22,10 @@ public class ProofController {
     public ProofController(ProofService service, SupabaseService supabaseService) {
         this.service = service;
         this.supabaseService = supabaseService;
+        System.out.println("========================================");
+        System.out.println("ProofController INITIALIZED");
+        System.out.println("SupabaseService injected: " + (supabaseService != null ? "YES" : "NO"));
+        System.out.println("========================================");
     }
 
     @PostMapping("/proof")
@@ -33,20 +37,37 @@ public class ProofController {
             @RequestParam("paymentMethod") String paymentMethod,
             @RequestParam("file") MultipartFile file
     ) {
+        System.out.println("========================================");
+        System.out.println("UPLOAD PROOF REQUEST RECEIVED");
+        System.out.println("Name: " + name);
+        System.out.println("Email: " + email);
+        System.out.println("Tickets: " + tickets);
+        System.out.println("Amount: " + amount);
+        System.out.println("Payment Method: " + paymentMethod);
+        System.out.println("File: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
+        System.out.println("========================================");
+
         try {
             // Upload to Supabase
+            System.out.println("Calling supabaseService.uploadFile()...");
             String fileUrl = supabaseService.uploadFile(file);
+            System.out.println("Upload completed. File URL: " + fileUrl);
 
             ProofOfPayment proof = new ProofOfPayment(
                     name, email, tickets, amount,
                     file.getOriginalFilename(),
-                    fileUrl, // Supabase public URL
+                    fileUrl,
                     paymentMethod
             );
 
-            return ResponseEntity.ok(service.saveProof(proof));
+            ProofOfPayment saved = service.saveProof(proof);
+            System.out.println("Proof saved to database with ID: " + saved.getId());
+
+            return ResponseEntity.ok(saved);
 
         } catch (IOException e) {
+            System.err.println("ERROR: Failed to upload file");
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to upload file: " + e.getMessage());
         }
@@ -66,14 +87,12 @@ public class ProofController {
                     .body("Proof not found");
         }
 
-        // Delete from Supabase
         try {
             supabaseService.deleteFile(proof.getFilePath());
         } catch (Exception e) {
             System.err.println("Failed to delete from Supabase: " + e.getMessage());
         }
 
-        // Delete DB record
         service.deleteProof(id);
 
         return ResponseEntity.ok("Proof deleted successfully");
