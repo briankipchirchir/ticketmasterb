@@ -97,4 +97,16 @@ public class ProofController {
 
         return ResponseEntity.ok("Proof deleted successfully");
     }
+
+    @PostMapping("/test-upload")
+    public ResponseEntity<?> testUpload(@RequestParam("file") MultipartFile file) {
+        try {
+            System.out.println("Testing Supabase upload...");
+            String url = supabaseService.uploadFile(file);
+            return ResponseEntity.ok("Success! URL: " + url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
 }
