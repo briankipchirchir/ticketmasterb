@@ -18,12 +18,22 @@ public class ProofOfPayment {
     private String filePath; // Stores the local path where file is saved
 
     private String paymentMethod;
+    private String eventName;        // ← new
+
+    private java.time.LocalDateTime uploadedAt;  // ← new
+
+    @PrePersist
+    protected void onCreate() {
+        this.uploadedAt = java.time.LocalDateTime.now(); // ← auto-set on save
+    }
+
+
 
     // Constructors
     public ProofOfPayment() {}
 
     // Full constructor including tickets and amount
-    public ProofOfPayment(String userName, String userEmail, String tickets, Double amount, String fileName, String filePath, String paymentMethod) {
+    public ProofOfPayment(String userName, String userEmail, String tickets, Double amount, String fileName, String filePath, String paymentMethod,String eventName) {
         this.userName = userName;
         this.userEmail = userEmail;
         this.tickets = tickets;
@@ -31,6 +41,7 @@ public class ProofOfPayment {
         this.fileName = fileName;
         this.filePath = filePath;
         this.paymentMethod = paymentMethod;
+        this.eventName = eventName;
     }
 
     // Getters & Setters
@@ -56,4 +67,10 @@ public class ProofOfPayment {
 
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public String getEventName() { return eventName; }
+    public void setEventName(String eventName) { this.eventName = eventName; }
+
+    public java.time.LocalDateTime getUploadedAt() { return uploadedAt; }
+    public void setUploadedAt(java.time.LocalDateTime uploadedAt) { this.uploadedAt = uploadedAt; }
 }

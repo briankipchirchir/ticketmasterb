@@ -35,6 +35,7 @@ public class ProofController {
             @RequestParam("tickets") String tickets,
             @RequestParam("amount") Double amount,
             @RequestParam("paymentMethod") String paymentMethod,
+            @RequestParam("eventName") String eventName,
             @RequestParam("file") MultipartFile file
     ) {
         System.out.println("========================================");
@@ -52,11 +53,14 @@ public class ProofController {
             System.out.println("Calling supabaseService.uploadFile()...");
             String fileUrl = supabaseService.uploadFile(file);
             System.out.println("Upload completed. File URL: " + fileUrl);
+            System.out.println("fileUrl returned by Supabase: " + fileUrl);
+
 
             ProofOfPayment proof = new ProofOfPayment(
                     name, email, tickets, amount,
                     file.getOriginalFilename(),
                     fileUrl,
+                    eventName,
                     paymentMethod
             );
 
