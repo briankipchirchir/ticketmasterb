@@ -3,6 +3,9 @@ package com.ticketmaster.service;
 import com.sendgrid.*;
 import com.sendgrid.helpers.mail.*;
 import org.springframework.stereotype.Service;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+
 
 @Service
 public class EmailService {
