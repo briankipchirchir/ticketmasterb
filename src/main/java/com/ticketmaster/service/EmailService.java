@@ -1,7 +1,7 @@
 package com.ticketmaster.service;
 
-import com.resend.*;
-import com.resend.services.emails.model.*;
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -9,7 +9,10 @@ public class EmailService {
 
     public void sendTicketEmail(String toEmail, String name, String tickets,
                                 String eventName, Double amount) throws Exception {
-        Resend resend = new Resend(System.getenv("RESEND_API_KEY"));
+
+        Email from = new Email("ticketmasterresaleservices9@gmail.com");
+        Email to = new Email(toEmail);
+        String subject = "🎟️ Your Ticket is Confirmed – " + eventName;
 
         String html = """
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
@@ -30,13 +33,14 @@ public class EmailService {
             </div>
         """.formatted(name, eventName, tickets, amount);
 
-        CreateEmailOptions params = CreateEmailOptions.builder()
-                .from("onboarding@resend.dev")
-                .to(toEmail)
-                .subject("🎟️ Your Ticket is Confirmed – " + eventName)
-                .html(html)
-                .build();
+        Content content = new Content("text/html", html);
+        Mail mail = new Mail(from, subject, to, content);
 
-        resend.emails().send(params);
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+        Request request = new Request();
+        request.setMethod(Method.POST);
+        request.setEndpoint("mail/send");
+        request.setBody(mail.build());
+        sg.api(request);
     }
 }
