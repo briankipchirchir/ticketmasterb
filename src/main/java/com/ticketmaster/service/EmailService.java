@@ -1,25 +1,17 @@
 package com.ticketmaster.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import com.resend.*;
+import com.resend.services.emails.model.*;
 import org.springframework.stereotype.Service;
-import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
-
     public void sendTicketEmail(String toEmail, String name, String tickets,
                                 String eventName, Double amount) throws Exception {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        Resend resend = new Resend(System.getenv("RESEND_API_KEY"));
 
-        helper.setTo(toEmail);
-        helper.setSubject("🎟️ Your Ticket is Confirmed – " + eventName);
-        helper.setText("""
+        String html = """
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
               <div style="background:#026cdf;padding:20px;border-radius:10px 10px 0 0;text-align:center;">
                 <h1 style="color:white;margin:0;">🎟️ Ticket Confirmed!</h1>
@@ -36,10 +28,15 @@ public class EmailService {
                 <p style="color:#555;font-size:13px;">Please show this email at the entrance. Enjoy the show! 🎉</p>
               </div>
             </div>
-        """.formatted(name, eventName, tickets, amount), true);
+        """.formatted(name, eventName, tickets, amount);
 
-        helper.setFrom("your-email@gmail.com"); // ← your sender email
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("onboarding@resend.dev")
+                .to(toEmail)
+                .subject("🎟️ Your Ticket is Confirmed – " + eventName)
+                .html(html)
+                .build();
 
-        mailSender.send(message);
+        resend.emails().send(params);
     }
 }
