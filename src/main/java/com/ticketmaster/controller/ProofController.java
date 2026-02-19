@@ -22,7 +22,7 @@ public class ProofController {
     private final EmailService emailService;
 
 
-    public ProofController(ProofService service, SupabaseService supabaseService) {
+    public ProofController(ProofService service, SupabaseService supabaseService,EmailService emailService) {
         this.service = service;
         this.supabaseService = supabaseService;
         this.emailService = emailService;
