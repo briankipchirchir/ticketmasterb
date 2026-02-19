@@ -21,6 +21,7 @@ public class ProofOfPayment {
     private String eventName;        // ← new
 
     private java.time.LocalDateTime uploadedAt;  // ← new
+    private boolean approved = false;
 
     @PrePersist
     protected void onCreate() {
@@ -73,4 +74,7 @@ public class ProofOfPayment {
 
     public java.time.LocalDateTime getUploadedAt() { return uploadedAt; }
     public void setUploadedAt(java.time.LocalDateTime uploadedAt) { this.uploadedAt = uploadedAt; }
+
+    public boolean isApproved() { return approved; }
+    public void setApproved(boolean approved) { this.approved = approved; }
 }

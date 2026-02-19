@@ -18,10 +18,13 @@ public class ProofController {
 
     private final ProofService service;
     private final SupabaseService supabaseService;
+    private final EmailService emailService;
+
 
     public ProofController(ProofService service, SupabaseService supabaseService) {
         this.service = service;
         this.supabaseService = supabaseService;
+        this.emailService = emailService;
         System.out.println("========================================");
         System.out.println("ProofController INITIALIZED");
         System.out.println("SupabaseService injected: " + (supabaseService != null ? "YES" : "NO"));
@@ -122,6 +125,30 @@ public class ProofController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/proofs/{id}/approve")
+    public ResponseEntity<?> approveProof(@PathVariable Long id) {
+        ProofOfPayment proof = service.getProofById(id);
+        if (proof == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Proof not found");
+        }
+
+        proof.setApproved(true);
+        service.saveProof(proof);
+
+        try {
+            emailService.sendTicketEmail(  // ← NOW PROPERLY CALLED
+                    proof.getUserEmail(),
+                    proof.getUserName(),
+                    proof.getTickets(),
+                    proof.getEventName(),
+                    proof.getAmount()
+            );
+            return ResponseEntity.ok("Approved and ticket sent to " + proof.getUserEmail());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Approved but email failed: " + e.getMessage());
         }
     }
 }
