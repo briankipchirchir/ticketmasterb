@@ -60,8 +60,8 @@ public class ProofController {
                     name, email, tickets, amount,
                     file.getOriginalFilename(),
                     fileUrl,
-                    eventName,
-                    paymentMethod
+                    paymentMethod,
+                    eventName
             );
 
             ProofOfPayment saved = service.saveProof(proof);
