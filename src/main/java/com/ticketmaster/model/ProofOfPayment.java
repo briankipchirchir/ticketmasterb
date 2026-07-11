@@ -23,6 +23,8 @@ public class ProofOfPayment {
     private java.time.LocalDateTime uploadedAt;  // ← new
     private boolean approved = false;
 
+    private String ticketFileUrl; 
+
     @PrePersist
     protected void onCreate() {
         this.uploadedAt = java.time.LocalDateTime.now(); // ← auto-set on save
@@ -77,4 +79,7 @@ public class ProofOfPayment {
 
     public boolean isApproved() { return approved; }
     public void setApproved(boolean approved) { this.approved = approved; }
+
+    public String getTicketFileUrl() { return ticketFileUrl; }
+public void setTicketFileUrl(String ticketFileUrl) { this.ticketFileUrl = ticketFileUrl; }
 }
