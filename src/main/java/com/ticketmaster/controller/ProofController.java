@@ -152,4 +152,26 @@ public class ProofController {
             return ResponseEntity.status(500).body("Approved but email failed: " + e.getMessage());
         }
     }
+
+
+    @PostMapping("/proofs/{id}/upload-ticket")
+public ResponseEntity<?> uploadTicket(
+        @PathVariable Long id,
+        @RequestParam("file") MultipartFile file
+) {
+    ProofOfPayment proof = service.getProofById(id);
+    if (proof == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Proof not found");
+    }
+ 
+    try {
+        String ticketUrl = supabaseService.uploadFile(file);
+        proof.setTicketFileUrl(ticketUrl);
+        ProofOfPayment saved = service.saveProof(proof);
+        return ResponseEntity.ok(saved);
+    } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to upload ticket: " + e.getMessage());
+    }
+}
 }
